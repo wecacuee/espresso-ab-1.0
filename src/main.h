@@ -1,5 +1,6 @@
 enum keys {
-    KEY_ESPRESSO, KEY_PLA_verify, KEY_check, KEY_contain, KEY_d1merge,
+    // KEY_ESPRESSO, 
+    KEY_PLA_verify, KEY_check, KEY_contain, KEY_d1merge,
     KEY_disjoint, KEY_dsharp, KEY_echo, KEY_essen, KEY_exact, KEY_expand,
     KEY_gasp, KEY_intersect, KEY_irred, KEY_lexsort, KEY_make_sparse,
     KEY_map, KEY_mapdc, KEY_minterms, KEY_opo, KEY_opoall,
@@ -19,8 +20,6 @@ struct {
     bool needs_dcset;
 } option_table [] = {
     /* ways to minimize functions */
-    {"ESPRESSO", KEY_ESPRESSO, 1, TRUE, TRUE},    /* must be first */
-    {"many", KEY_MANY_ESPRESSO, 1, TRUE, TRUE},
     {"exact", KEY_exact, 1, TRUE, TRUE},
     {"qm", KEY_qm, 1, TRUE, TRUE},
     {"single_output", KEY_so, 1, TRUE, TRUE},

@@ -13,7 +13,7 @@
  *  Old style -do xxx, -out xxx, etc. are still supported.
  */
 
-#include "espresso.h"
+#include "set.h"
 #include "main.h"		/* table definitions for options */
 #include <unistd.h>
 
@@ -210,89 +210,6 @@ int main(int argc, char **argv)
 
 /******************** Espresso operations ********************/
 
-    case KEY_ESPRESSO:
-	Fold = sf_save(PLA->F);
-	PLA->F = espresso(PLA->F, PLA->D, PLA->R);
-	EXECUTE(error=verify(PLA->F,Fold,PLA->D), VERIFY_TIME, PLA->F, cost);
-	if (error) {
-	    print_solution = FALSE;
-	    PLA->F = Fold;
-	    (void) check_consistency(PLA);
-	} else {
-	    free_cover(Fold);
-	}
-	break;
-
-    case KEY_MANY_ESPRESSO: {
-	int pla_type;
-	do {
-	    EXEC(PLA->F=espresso(PLA->F,PLA->D,PLA->R),"ESPRESSO   ",PLA->F);
-	    if (print_solution) {
-		fprint_pla(stdout, PLA, out_type);
-		(void) fflush(stdout);
-	    }
-	    pla_type = PLA->pla_type;
-	    free_PLA(PLA);
-	    setdown_cube();
-	    FREE(cube.part_size);
-	} while (read_pla(last_fp, TRUE, TRUE, pla_type, &PLA) != EOF);
-	exit(0);
-    }
-
-    case KEY_simplify:
-	EXEC(PLA->F = simplify(cube1list(PLA->F)), "SIMPLIFY  ", PLA->F);
-	break;
-
-    case KEY_so:	        /* minimize all functions as single-output */
-	if (strategy < 0 || strategy > 1) {
-	    strategy = 0;
-	}
-	so_espresso(PLA, strategy);
-	break;
-
-    case KEY_so_both:		/* minimize all functions as single-output */
-	if (strategy < 0 || strategy > 1) {
-	    strategy = 0;
-	}
-	so_both_espresso(PLA, strategy);
-	break;
-
-    case KEY_expand:            /* execute expand */
-	EXECUTE(PLA->F=expand(PLA->F,PLA->R,FALSE),EXPAND_TIME, PLA->F, cost);
-	break;
-
-    case KEY_irred:             /* extract minimal irredundant subset */
-	EXECUTE(PLA->F = irredundant(PLA->F, PLA->D), IRRED_TIME, PLA->F, cost);
-	break;
-
-    case KEY_reduce:            /* perform reduction */
-	EXECUTE(PLA->F = reduce(PLA->F, PLA->D), REDUCE_TIME, PLA->F, cost);
-	break;
-
-    case KEY_essen:             /* check for essential primes */
-	foreach_set(PLA->F, last1, p) {
-	    SET(p, RELESSEN);
-	    RESET(p, NONESSEN);
-	}
-	EXECUTE(F = essential(&(PLA->F), &(PLA->D)), ESSEN_TIME, PLA->F, cost);
-	free_cover(F);
-	break;
-
-    case KEY_super_gasp:
-	PLA->F = super_gasp(PLA->F, PLA->D, PLA->R, &cost);
-	break;
-
-    case KEY_gasp:
-	PLA->F = last_gasp(PLA->F, PLA->D, PLA->R, &cost);
-	break;
-
-    case KEY_make_sparse:       /* make_sparse step of Espresso */
-	PLA->F = make_sparse(PLA->F, PLA->D, PLA->R);
-	break;
-
-    case KEY_exact:
-	exact_cover = TRUE;
-
     case KEY_qm:
 	Fold = sf_save(PLA->F);
 	PLA->F = minimize_exact(PLA->F, PLA->D, PLA->R, exact_cover);
@@ -314,45 +231,6 @@ int main(int argc, char **argv)
 	map(PLA->F);
 	print_solution = FALSE;
 	break;
-
-    case KEY_signature:
-	Fold = sf_save(PLA->F);
-	PLA->F = signature(PLA->F, PLA->D, PLA->R);
-	EXECUTE(error=verify(PLA->F,Fold,PLA->D), VERIFY_TIME, PLA->F, cost);
-	if (error) {
-	    print_solution = FALSE;
-	    PLA->F = Fold;
-	    (void) check_consistency(PLA);
-	} else {
-	    free_cover(Fold);
-	}
-	break;
-
-/******************** Output phase and bit pairing ********************/
-
-    case KEY_opo:               /* sasao output phase assignment */
-	phase_assignment(PLA, strategy);
-	break;
-
-    case KEY_opoall:		/* try all phase assignments (!) */
-	if (first < 0 || first >= cube.part_size[cube.output]) {
-	    first = 0;
-	}
-	if (last < 0 || last >= cube.part_size[cube.output]) {
-	    last = cube.part_size[cube.output] - 1;
-	}
-	opoall(PLA, first, last, strategy);
-	break;
-
-    case KEY_pair:              /* find an optimal pairing */
-	find_optimal_pairing(PLA, strategy);
-	break;
-
-    case KEY_pairall:		/* try all pairings !! */
-	pair_all(PLA, strategy);
-	break;
-
-
 
 /******************** Simple cover operations ********************/
 
@@ -407,100 +285,6 @@ int main(int argc, char **argv)
 	}
 	PLA->F = sf_dupl(unravel_range(PLA->F, first, last));
 	break;
-
-    case KEY_d1merge:				/* distance-1 merge */
-	if (first < 0 || first >= cube.num_vars) {
-	    first = 0;
-	}
-	if (last < 0 || last >= cube.num_vars) {
-	    last = cube.num_vars - 1;
-	}
-	for(i = first; i <= last; i++) {
-	    PLA->F = d1merge(PLA->F, i);
-	}
-	break;
-
-    case KEY_d1merge_in:		/* distance-1 merge inputs only */
-	for(i = 0; i < cube.num_binary_vars; i++) {
-	    PLA->F = d1merge(PLA->F, i);
-	}
-	break;
-
-    case KEY_PLA_verify:		/* check two PLAs for equivalence */
-	EXECUTE(error = PLA_verify(PLA, PLA1), VERIFY_TIME, PLA->F, cost);
-	if (error) {
-	    printf("PLA comparison failed; the PLA's are not equivalent\n");
-	    exit(1);
-	} else {
-	    printf("PLA's compared equal\n");
-	    exit(0);
-	}
-	break;	/* silly */
-
-    case KEY_verify:			/* check two covers for equivalence */
-	Fold = PLA->F;	Dold = PLA->D;	F = PLA1->F;
-	EXECUTE(error=verify(F, Fold, Dold), VERIFY_TIME, PLA->F, cost);
-	if (error) {
-	    printf("PLA comparison failed; the PLA's are not equivalent\n");
-	    exit(1);
-	} else {
-	    printf("PLA's compared equal\n");
-	    exit(0);
-	}	
-	break;	/* silly */
-
-    case KEY_check:			/* check consistency */
-	(void) check_consistency(PLA);
-	print_solution = FALSE;
-	break;
-
-    case KEY_mapdc:			/* compute don't care set */
-	map_dcset(PLA);
-	out_type = FD_type;
-	break;
-
-    case KEY_equiv:
-	find_equiv_outputs(PLA);
-	print_solution = FALSE;
-	break;
-
-    case KEY_separate:			/* remove PLA->D from PLA->F */
-	PLA->F = complement(cube2list(PLA->D, PLA->R));
-	break;
-
-    case KEY_xor: {
-	pcover T1 = cv_intersect(PLA->F, PLA1->R);
-	pcover T2 = cv_intersect(PLA1->F, PLA->R);
-	free_cover(PLA->F);
-	PLA->F = sf_contain(sf_join(T1, T2));
-	free_cover(T1);
-	free_cover(T2);
-	break;
-    }
-
-    case KEY_fsm: {
-	disassemble_fsm(PLA, summary);
-	print_solution = FALSE;
-	break;
-    }
-
-    case KEY_test: {
-	pcover T, E;
-	T = sf_join(PLA->D, PLA->R);
-	E = new_cover(10);
-	sf_free(PLA->F);
-	EXECUTE(PLA->F = complement(cube1list(T)), COMPL_TIME, PLA->F, cost);
-	EXECUTE(PLA->F = expand(PLA->F, T, FALSE), EXPAND_TIME, PLA->F, cost);
-	EXECUTE(PLA->F = irredundant(PLA->F, E), IRRED_TIME, PLA->F, cost);
-	sf_free(T);
-	T = sf_join(PLA->F, PLA->R);
-	EXECUTE(PLA->D = expand(PLA->D, T, FALSE), EXPAND_TIME, PLA->D, cost);
-	EXECUTE(PLA->D = irredundant(PLA->D, E), IRRED_TIME, PLA->D, cost);
-	sf_free(T);
-	sf_free(E);
-	break;
-    }
-
 
     }
 

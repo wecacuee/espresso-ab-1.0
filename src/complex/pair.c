@@ -1,4 +1,4 @@
-#include "espresso.h"
+#include "set.h"
 
 int **find_pairing_cost(pPLA PLA, int strategy);
 
@@ -205,6 +205,7 @@ pcover delvar(pset_family A, int *paired)
 			    17,18  34,459,425
 			    19,20 654,729,075
 */
+/*
 void find_optimal_pairing(pPLA PLA, int strategy)
 {
     int i, j, **cost_array;
@@ -239,6 +240,7 @@ void find_optimal_pairing(pPLA PLA, int strategy)
     set_pair(PLA);
     EXEC_S(PLA->F=espresso(PLA->F,PLA->D,PLA->R),"ESPRESSO  ",PLA->F);
 }
+*/
 
 int **find_pairing_cost(pPLA PLA, int strategy)
 {

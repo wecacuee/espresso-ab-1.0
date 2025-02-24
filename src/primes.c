@@ -1,4 +1,4 @@
-#include "espresso.h"
+#include "set.h"
 
 static bool primes_consensus_special_cases(pset *T, pset_family *Tnew);
 static pcover primes_consensus_merge(pset_family Tl, pset_family Tr, pset cl, pset cr);

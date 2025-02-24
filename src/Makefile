@@ -11,12 +11,12 @@
 # PARTICULAR PURPOSE.
 
 
-SHELL = /bin/sh
+SHELL = /bin/bash
 
 srcdir = .
 top_srcdir = ..
 
-prefix = /usr/local
+prefix = /home/vdhiman/Downloads/espresso-ab-1.0/install
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -27,8 +27,8 @@ sysconfdir = ${prefix}/etc
 sharedstatedir = ${prefix}/com
 localstatedir = ${prefix}/var
 libdir = ${exec_prefix}/lib
-infodir = ${prefix}/info
-mandir = ${prefix}/man
+infodir = ${prefix}/share/info
+mandir = ${prefix}/share/man
 includedir = ${prefix}/include
 oldincludedir = /usr/include
 
@@ -40,12 +40,12 @@ pkgincludedir = $(includedir)/espresso-ab
 
 top_builddir = ..
 
-ACLOCAL = aclocal
+ACLOCAL = aclocal-1.16
 AUTOCONF = autoconf
-AUTOMAKE = automake
+AUTOMAKE = automake-1.16
 AUTOHEADER = autoheader
 
-INSTALL = /usr/local/bin/ginstall -c
+INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = ${INSTALL} $(AM_INSTALL_PROGRAM_FLAGS)
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_SCRIPT = ${INSTALL}
@@ -64,7 +64,46 @@ VERSION = 1.0
 
 bin_PROGRAMS = espresso
 
-espresso_SOURCES =  	black_white.c 	canonical.c 	cofactor.c 	cols.c 	compl.c 	contain.c 	copyright.h 	cpu_time.c 	cubestr.c 	cvrin.c 	cvrm.c 	cvrmisc.c 	cvrout.c 	dominate.c 	equiv.c 	espresso.c espresso.h 	essen.c 	essentiality.c 	exact.c 	expand.c 	gasp.c 	gimpel.c 	globals.c 	hack.c 	indep.c 	irred.c 	main.c main.h 	map.c 	matrix.c 	mincov.c mincov.h 	mincov_int.h 	opo.c 	pair.c 	part.c 	port.h 	primes.c 	prtime.c 	reduce.c 	rows.c 	set.c 	setc.c 	sharp.c 	sigma.c 	signature.c 	signature_exact.c 	signature.h 	sminterf.c 	solution.c 	sparse.c sparse.h 	sparse_int.h 	unate.c 	utility.h 	util_signature.c 	verify.c
+# espresso_SOURCES =  	black_white.c 	canonical.c 	cofactor.c 	cols.c 	compl.c 	contain.c 	copyright.h 	cpu_time.c 	cubestr.c 	cvrin.c 	cvrm.c 	cvrmisc.c 	cvrout.c 	dominate.c 	equiv.c 	espresso.c espresso.h 	essen.c 	essentiality.c 	exact.c 	expand.c 	gasp.c 	gimpel.c 	globals.c 	hack.c 	indep.c 	irred.c 	main.c main.h 	map.c 	matrix.c 	mincov.c mincov.h 	mincov_int.h 	opo.c 	pair.c 	part.c 	port.h 	primes.c 	prtime.c 	reduce.c 	rows.c 	set.c 	setc.c 	sharp.c 	sigma.c 	signature.c 	signature_exact.c 	signature.h 	sminterf.c 	solution.c 	sparse.c sparse.h 	sparse_int.h 	unate.c 	utility.h 	util_signature.c 	verify.c
+espresso_SOURCES  = \
+		cofactor.c \
+		cols.c \
+		compl.c \
+		contain.c \
+		cpu_time.c \
+		cubestr.c \
+		cvr.h \
+		cvrin.c \
+		cvrm.c \
+		cvrmisc.c \
+		cvrout.c \
+		dominate.c \
+		exact.c \
+		exact.h \
+		gimpel.c \
+		globals.c \
+		hack.c \
+		indep.c \
+		irred.c \
+		main.c \
+		main.h \
+		mincov.c \
+		mincov.h \
+		part.c \
+		primes.c \
+		prtime.c \
+		set.c \
+		set.h \
+		setc.c \
+		sharp.c \
+		sparse.h \
+		sparse_int.h \
+		map.c \
+		matrix.c \
+		rows.c \
+		solution.c \
+		unate.c \
+		verify.c
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../config.h
@@ -76,13 +115,45 @@ DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I..
 CPPFLAGS = 
 LDFLAGS = 
 LIBS = 
-espresso_OBJECTS =  black_white.o canonical.o cofactor.o cols.o compl.o \
-contain.o cpu_time.o cubestr.o cvrin.o cvrm.o cvrmisc.o cvrout.o \
-dominate.o equiv.o espresso.o essen.o essentiality.o exact.o expand.o \
-gasp.o gimpel.o globals.o hack.o indep.o irred.o main.o map.o matrix.o \
-mincov.o opo.o pair.o part.o primes.o prtime.o reduce.o rows.o set.o \
-setc.o sharp.o sigma.o signature.o signature_exact.o sminterf.o \
-solution.o sparse.o unate.o util_signature.o verify.o
+# espresso_OBJECTS =  black_white.o canonical.o cofactor.o cols.o compl.o \
+# contain.o cpu_time.o cubestr.o cvrin.o cvrm.o cvrmisc.o cvrout.o \
+# dominate.o equiv.o espresso.o essen.o essentiality.o exact.o expand.o \
+# gasp.o gimpel.o globals.o hack.o indep.o irred.o main.o map.o matrix.o \
+# mincov.o opo.o pair.o part.o primes.o prtime.o reduce.o rows.o set.o \
+# setc.o sharp.o sigma.o signature.o signature_exact.o sminterf.o \
+# solution.o sparse.o unate.o util_signature.o verify.o
+espresso_OBJECTS = \
+		   cofactor.o \
+		   cols.o \
+		   compl.o \
+		   contain.o \
+		   cpu_time.o \
+		   cubestr.o \
+		   cvrin.o \
+		   cvrm.o \
+		   cvrmisc.o \
+		   cvrout.o \
+		   dominate.o \
+		   exact.o \
+		   gimpel.o \
+		   globals.o \
+		   hack.o \
+		   indep.o \
+		   irred.o \
+		   main.o \
+		   mincov.o \
+		   part.o \
+		   primes.o \
+		   prtime.o \
+		   set.o \
+		   setc.o \
+		   sharp.o \
+		   matrix.o \
+		   map.o \
+		   rows.o \
+		   solution.o \
+		   unate.o \
+		   verify.o
 espresso_LDADD = $(LDADD)
 espresso_DEPENDENCIES = 
 espresso_LDFLAGS = 

@@ -1,3 +1,4 @@
+#include "cvr.h"
 /*
     module: cvrm.c
     Purpose: miscellaneous cover manipulation
@@ -6,8 +7,86 @@
 	c) sort covers
 */
 
-#include "espresso.h"
+/*
+ *  cubelist_partition -- take a cubelist T and see if it has any components;
+ *  if so, return cubelist's of the two partitions A and B; the return value
+ *  is the size of the partition; if not, A and B
+ *  are undefined and the return value is 0
+ */
+int cubelist_partition(pset *T, pset **A, pset **B, unsigned int comp_debug)
+         			/* a list of cubes */
+               			/* cubelist of partition and remainder */
+                        
+{
+    register pcube *T1, p, seed, cof;
+    pcube *A1, *B1;
+    bool change;
+    int count, numcube;
 
+    numcube = CUBELISTSIZE(T);
+
+    /* Mark all cubes -- covered cubes belong to the partition */
+    for(T1 = T+2; (p = *T1++) != NULL; ) {
+	RESET(p, COVERED);
+    }
+
+    /*
+     *  Extract a partition from the cubelist T; start with the first cube as a
+     *  seed, and then pull in all cubes which share a variable with the seed;
+     *  iterate until no new cubes are brought into the partition.
+     */
+    seed = set_save(T[2]);
+    cof = T[0];
+    SET(T[2], COVERED);
+    count = 1;
+
+    do {
+	change = FALSE;
+	for(T1 = T+2; (p = *T1++) != NULL; ) {
+	    if (! TESTP(p, COVERED) && ccommon(p, seed, cof)) {
+		INLINEset_and(seed, seed, p);
+		SET(p, COVERED);
+		change = TRUE;
+		count++;
+	    }
+	
+	}
+    } while (change);
+
+    set_free(seed);
+
+    if (comp_debug) {
+	printf("COMPONENT_REDUCTION: split into %d %d\n",
+	    count, numcube - count);
+    }
+
+    if (count != numcube) {
+	/* Allocate and setup the cubelist's for the two partitions */
+	*A = A1 = ALLOC(pcube, numcube+3);
+	*B = B1 = ALLOC(pcube, numcube+3);
+	(*A)[0] = set_save(T[0]);
+	(*B)[0] = set_save(T[0]);
+	A1 = *A + 2;
+	B1 = *B + 2;
+
+	/* Loop over the cubes in T and distribute to A and B */
+	for(T1 = T+2; (p = *T1++) != NULL; ) {
+	    if (TESTP(p, COVERED)) {
+		*A1++ = p;
+	    } else {
+		*B1++ = p;
+	    }
+	}
+
+	/* Stuff needed at the end of the cubelist's */
+	*A1++ = NULL;
+	(*A)[1] = (pcube) A1;
+	*B1++ = NULL;
+	(*B)[1] = (pcube) B1;
+    }
+
+    return numcube - count;
+}
 
 static void cb_unravel(register pset c, int start, int end, pset startbase, pset_family B1)
 {
@@ -96,7 +175,47 @@ pcover unravel(pset_family B, int start)
 {
     return unravel_range(B, start, cube.num_vars-1);
 }
-
+
+/*
+ *  quick cofactor against a single output function
+ */
+pcover cof_output(pset_family T, register int i)
+{
+    pcover T1;
+    register pcube p, last, pdest, mask;
+
+    mask = cube.var_mask[cube.output];
+    T1 = new_cover(T->count);
+    foreach_set(T, last, p) {
+	if (is_in_set(p, i)) {
+	    pdest = GETSET(T1, T1->count++);
+	    INLINEset_or(pdest, p, mask);
+	    RESET(pdest, PRIME);
+	}
+    }
+    return T1;
+}
+
+
+/*
+ *  quick intersection against a single output function
+ */
+pcover uncof_output(pset_family T, int i)
+{
+    register pcube p, last, mask;
+
+    if (T == NULL) {
+	return T;
+    }
+
+    mask = cube.var_mask[cube.output];
+    foreach_set(T, last, p) {
+	INLINEset_diff(p, p, mask);
+	set_insert(p, i);
+    }
+    return T;
+}
+
 /* lex_sort -- sort cubes in a standard lexical fashion */
 pcover lex_sort(pset_family T)
 {
@@ -199,127 +318,6 @@ pcover random_order(register pset_family F)
     return F;
 }
 
-/*
- *  cubelist_partition -- take a cubelist T and see if it has any components;
- *  if so, return cubelist's of the two partitions A and B; the return value
- *  is the size of the partition; if not, A and B
- *  are undefined and the return value is 0
- */
-int cubelist_partition(pset *T, pset **A, pset **B, unsigned int comp_debug)
-         			/* a list of cubes */
-               			/* cubelist of partition and remainder */
-                        
-{
-    register pcube *T1, p, seed, cof;
-    pcube *A1, *B1;
-    bool change;
-    int count, numcube;
-
-    numcube = CUBELISTSIZE(T);
-
-    /* Mark all cubes -- covered cubes belong to the partition */
-    for(T1 = T+2; (p = *T1++) != NULL; ) {
-	RESET(p, COVERED);
-    }
-
-    /*
-     *  Extract a partition from the cubelist T; start with the first cube as a
-     *  seed, and then pull in all cubes which share a variable with the seed;
-     *  iterate until no new cubes are brought into the partition.
-     */
-    seed = set_save(T[2]);
-    cof = T[0];
-    SET(T[2], COVERED);
-    count = 1;
-
-    do {
-	change = FALSE;
-	for(T1 = T+2; (p = *T1++) != NULL; ) {
-	    if (! TESTP(p, COVERED) && ccommon(p, seed, cof)) {
-		INLINEset_and(seed, seed, p);
-		SET(p, COVERED);
-		change = TRUE;
-		count++;
-	    }
-	
-	}
-    } while (change);
-
-    set_free(seed);
-
-    if (comp_debug) {
-	printf("COMPONENT_REDUCTION: split into %d %d\n",
-	    count, numcube - count);
-    }
-
-    if (count != numcube) {
-	/* Allocate and setup the cubelist's for the two partitions */
-	*A = A1 = ALLOC(pcube, numcube+3);
-	*B = B1 = ALLOC(pcube, numcube+3);
-	(*A)[0] = set_save(T[0]);
-	(*B)[0] = set_save(T[0]);
-	A1 = *A + 2;
-	B1 = *B + 2;
-
-	/* Loop over the cubes in T and distribute to A and B */
-	for(T1 = T+2; (p = *T1++) != NULL; ) {
-	    if (TESTP(p, COVERED)) {
-		*A1++ = p;
-	    } else {
-		*B1++ = p;
-	    }
-	}
-
-	/* Stuff needed at the end of the cubelist's */
-	*A1++ = NULL;
-	(*A)[1] = (pcube) A1;
-	*B1++ = NULL;
-	(*B)[1] = (pcube) B1;
-    }
-
-    return numcube - count;
-}
-
-/*
- *  quick cofactor against a single output function
- */
-pcover cof_output(pset_family T, register int i)
-{
-    pcover T1;
-    register pcube p, last, pdest, mask;
-
-    mask = cube.var_mask[cube.output];
-    T1 = new_cover(T->count);
-    foreach_set(T, last, p) {
-	if (is_in_set(p, i)) {
-	    pdest = GETSET(T1, T1->count++);
-	    INLINEset_or(pdest, p, mask);
-	    RESET(pdest, PRIME);
-	}
-    }
-    return T1;
-}
-
-
-/*
- *  quick intersection against a single output function
- */
-pcover uncof_output(pset_family T, int i)
-{
-    register pcube p, last, mask;
-
-    if (T == NULL) {
-	return T;
-    }
-
-    mask = cube.var_mask[cube.output];
-    foreach_set(T, last, p) {
-	INLINEset_diff(p, p, mask);
-	set_insert(p, i);
-    }
-    return T;
-}
-
 
 /*
  *  A generic routine to perform an operation for each output function
@@ -366,128 +364,4 @@ void foreach_output_function(pPLA PLA, int (*func) (pPLA, int), int (*func1) (pP
 	
 
     }
-}
-
-static pcover Fmin;
-static pcube phase;
-
-/*
- *  minimize each output function individually
- */
-void so_espresso(pPLA PLA, int strategy)
-{
-    Fmin = new_cover(PLA->F->count);
-    if (strategy == 0) {
-	foreach_output_function(PLA, so_do_espresso, so_save);
-    } else {
-	foreach_output_function(PLA, so_do_exact, so_save);
-    }
-    sf_free(PLA->F);
-    PLA->F = Fmin;
-}
-
-
-/*
- *  minimize each output function, choose function or complement based on the
- *  one with the fewer number of terms
- */
-void so_both_espresso(pPLA PLA, int strategy)
-{
-    phase = set_save(cube.fullset);
-    Fmin = new_cover(PLA->F->count);
-    if (strategy == 0) {
-	foreach_output_function(PLA, so_both_do_espresso, so_both_save);
-    } else {
-	foreach_output_function(PLA, so_both_do_exact, so_both_save);
-    }
-    sf_free(PLA->F);
-    PLA->F = Fmin;
-    PLA->phase = phase;
-}
-
-
-int so_do_espresso(pPLA PLA, int i)
-{
-    char word[32];
-
-    /* minimize the single-output function (on-set) */
-    skip_make_sparse = 1;
-    (void) sprintf(word, "ESPRESSO-POS(%d)", i);
-    EXEC_S(PLA->F = espresso(PLA->F, PLA->D, PLA->R), word, PLA->F);
-    return 1;
-}
-
-
-int so_do_exact(pPLA PLA, int i)
-{
-    char word[32];
-
-    /* minimize the single-output function (on-set) */
-    skip_make_sparse = 1;
-    (void) sprintf(word, "EXACT-POS(%d)", i);
-    EXEC_S(PLA->F = minimize_exact(PLA->F, PLA->D, PLA->R, 1), word, PLA->F);
-    return 1;
-}
-
-
-/*ARGSUSED*/
-int so_save(pPLA PLA, int i)
-{
-    Fmin = sf_append(Fmin, PLA->F);	/* disposes of PLA->F */
-    PLA->F = NULL;
-    return 1;
-}
-
-
-int so_both_do_espresso(pPLA PLA, int i)
-{
-    char word[32];
-
-    /* minimize the single-output function (on-set) */
-    (void) sprintf(word, "ESPRESSO-POS(%d)", i);
-    skip_make_sparse = 1;
-    EXEC_S(PLA->F = espresso(PLA->F, PLA->D, PLA->R), word, PLA->F);
-
-    /* minimize the single-output function (off-set) */
-    (void) sprintf(word, "ESPRESSO-NEG(%d)", i);
-    skip_make_sparse = 1;
-    EXEC_S(PLA->R = espresso(PLA->R, PLA->D, PLA->F), word, PLA->R);
-
-    return 1;
-}
-
-
-int so_both_do_exact(pPLA PLA, int i)
-{
-    char word[32];
-
-    /* minimize the single-output function (on-set) */
-    (void) sprintf(word, "EXACT-POS(%d)", i);
-    skip_make_sparse = 1;
-    EXEC_S(PLA->F = minimize_exact(PLA->F, PLA->D, PLA->R, 1), word, PLA->F);
-
-    /* minimize the single-output function (off-set) */
-    (void) sprintf(word, "EXACT-NEG(%d)", i);
-    skip_make_sparse = 1;
-    EXEC_S(PLA->R = minimize_exact(PLA->R, PLA->D, PLA->F, 1), word, PLA->R);
-
-    return 1;
-}
-
-
-int so_both_save(pPLA PLA, int i)
-{
-    if (PLA->F->count > PLA->R->count) {
-	sf_free(PLA->F);
-	PLA->F = PLA->R;
-	PLA->R = NULL;
-	i += cube.first_part[cube.output];
-	set_remove(phase, i);
-    } else {
-	sf_free(PLA->R);
-	PLA->R = NULL;
-    }
-    Fmin = sf_append(Fmin, PLA->F);
-    PLA->F = NULL;
-    return 1;
 }

@@ -3,7 +3,7 @@
     purpose: cube and cover input routines
 */
 
-#include "espresso.h"
+#include "cvr.h"
 
 static bool line_length_error;
 static int lineno;
@@ -538,14 +538,15 @@ int read_pla(FILE *fp, int needs_dcset, int needs_offset, int pla_type, pPLA *PL
 	PLA->R = onset;
 	PLA->phase = new_cube();
 	set_diff(PLA->phase, cube.fullset, cube.var_mask[cube.num_vars-1]);
-    } else if (PLA->phase != NULL) {
-	(void) set_phase(PLA);
-    }
+    } 
+    // else if (PLA->phase != NULL) {
+    //     (void) set_phase(PLA);
+    // }
 
     /* Setup minimization for two-bit decoders */
-    if (PLA->pair != (ppair) NULL) {
-	set_pair(PLA);
-    }
+    // if (PLA->pair != (ppair) NULL) {
+    //     set_pair(PLA);
+    // }
 
     if (PLA->symbolic != NIL(symbolic_t)) {
 	EXEC(map_symbolic(PLA), "MAP-INPUT  ", PLA->F);

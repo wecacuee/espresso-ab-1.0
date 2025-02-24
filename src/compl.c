@@ -15,7 +15,7 @@
  *      accuracy of the results.
  */
 
-#include "espresso.h"
+#include "set.h"
 
 #define USE_COMPL_LIFT			0
 #define USE_COMPL_LIFT_ONSET		1

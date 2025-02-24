@@ -1,4 +1,4 @@
-#include "espresso.h"
+#include "set.h"
 
 static void fcube_is_covered(pset *T, pset c, sm_matrix *table);
 static void ftautology(pset *T, sm_matrix *table);

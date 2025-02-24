@@ -9,7 +9,7 @@
     the "dense" variables (using modified version of expand).
 */
 
-#include "espresso.h"
+#include "set.h"
 
 pcover make_sparse(pset_family F, pset_family D, pset_family R)
 {

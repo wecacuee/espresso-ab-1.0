@@ -1,4 +1,4 @@
-#include "espresso.h"
+#include "set.h"
 
 
 static void dump_irredundant(pset_family E, pset_family Rt, pset_family Rp, sm_matrix *table);
@@ -95,9 +95,9 @@ do_minimize(pset_family F, pset_family D, pset_family R, int exact_cover, int we
 
     /* Attempt to make the results more sparse */
     debug &= ~ (IRRED | SHARP | MINCOV);
-    if (! skip_make_sparse && R != 0) {
-	newF = make_sparse(newF, D, R);
-    }
+    // if (! skip_make_sparse && R != 0) {
+    //     newF = make_sparse(newF, D, R);
+    // }
 
     debug = debug_save;
     return newF;

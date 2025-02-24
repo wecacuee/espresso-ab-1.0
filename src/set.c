@@ -4,7 +4,7 @@
 
 /* LINTLIBRARY */
 
-#include "espresso.h"
+#include "set.h"
 static pset_family set_family_garbage = NULL;
 
 static void intcpy(register unsigned int *d, register unsigned int *s, register long int n)
