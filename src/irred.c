@@ -1,4 +1,4 @@
-#include "set.h"
+#include "cvr.h"
 
 static void fcube_is_covered(pset *T, pset c, sm_matrix *table);
 static void ftautology(pset *T, sm_matrix *table);
@@ -288,7 +288,7 @@ start:
 	T[1] = (pcube) Tsave;
 
 	if (debug & TAUT) {
-	    printf("UNATE_REDUCTION: %d unate variables, reduced to %d\n",
+	    printf("UNATE_REDUCTION: %d unate variables, reduced to %ld\n",
 		cdata.vars_unate, CUBELISTSIZE(T));
 	}
 	goto start;
@@ -412,7 +412,7 @@ start:
 	T[1] = (pcube) Tsave;
 
 	if (debug & TAUT) {
-	    printf("UNATE_REDUCTION: %d unate variables, reduced to %d\n",
+	    printf("UNATE_REDUCTION: %d unate variables, reduced to %ld\n",
 		cdata.vars_unate, CUBELISTSIZE(T));
 	}
 	goto start;

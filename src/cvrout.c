@@ -394,11 +394,11 @@ void makeup_labels(pPLA PLA)
 		PLA->label[ind] = ALLOC(char, 15);
 		if (var < cube.num_binary_vars)
 		    if ((i % 2) == 0)
-			(void) sprintf(PLA->label[ind], "v%d.bar", var);
+			(void) sprintf(PLA->label[ind], "v%d.bar", (short) var);
 		    else
-			(void) sprintf(PLA->label[ind], "v%d", var);
+			(void) sprintf(PLA->label[ind], "v%d", (short) var);
 		else
-		    (void) sprintf(PLA->label[ind], "v%d.%d", var, i);
+		    (void) sprintf(PLA->label[ind], "v%d.%d", (short) var, (short) i);
 	    }
 	}
 }

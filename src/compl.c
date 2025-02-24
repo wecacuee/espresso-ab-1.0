@@ -15,7 +15,7 @@
  *      accuracy of the results.
  */
 
-#include "set.h"
+#include "cvr.h"
 
 #define USE_COMPL_LIFT			0
 #define USE_COMPL_LIFT_ONSET		1

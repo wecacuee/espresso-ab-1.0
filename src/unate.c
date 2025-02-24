@@ -2,7 +2,7 @@
  *  unate.c -- routines for dealing with unate functions
  */
 
-#include "set.h"
+#include "cvr.h"
 
 static pset_family abs_covered(pset_family A, register int pick);
 static pset_family abs_covered_many(pset_family A, register pset pick_set);

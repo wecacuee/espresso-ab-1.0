@@ -1,4 +1,4 @@
-#include "set.h"
+#include "cvr.h"
 
 void map_dcset(pPLA PLA)
 {
@@ -417,7 +417,7 @@ void symbolic_hack_labels(pPLA PLA, symbolic_t *list, pset compress, int new_siz
 	for(i = 0; i < (1 << p1->symbolic_list_length); i++) {
 	    if (p3 == NIL(symbolic_label_t)) {
 		PLA->label[base+i] = ALLOC(char, 10);
-		(void) sprintf(PLA->label[base+i], "X%d", i);
+		(void) sprintf(PLA->label[base+i], "X%d", (short) i);
 	    } else {
 		PLA->label[base+i] = p3->label;
 		p3 = p3->next;

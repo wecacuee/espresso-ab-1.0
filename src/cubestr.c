@@ -2,7 +2,7 @@
     Module: cubestr.c -- routines for managing the global cube structure
 */
 
-#include "set.h"
+#include "cvr.h"
 
 /*
     cube_setup -- assume that the fields "num_vars", "num_binary_vars", and

@@ -1,4 +1,4 @@
-#include "set.h"
+#include "cvr.h"
 
 /*
     The cofactor of a cover against a cube "c" is a cover formed by the

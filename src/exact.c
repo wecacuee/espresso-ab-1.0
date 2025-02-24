@@ -1,4 +1,4 @@
-#include "set.h"
+#include "cvr.h"
 
 
 static void dump_irredundant(pset_family E, pset_family Rt, pset_family Rp, sm_matrix *table);

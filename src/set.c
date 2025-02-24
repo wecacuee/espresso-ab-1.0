@@ -4,7 +4,7 @@
 
 /* LINTLIBRARY */
 
-#include "set.h"
+#include "cvr.h"
 static pset_family set_family_garbage = NULL;
 
 static void intcpy(register unsigned int *d, register unsigned int *s, register long int n)
@@ -394,13 +394,13 @@ pset_family sf_read(FILE *fp)
     register pset p, last;
     pset_family A;
 
-    (void) fscanf(fp, "%d %d\n", &i, &j);
+    if (fscanf(fp, "%d %d\n", &i, &j));
     A = sf_new(i, j);
     A->count = i;
     foreach_set(A, last, p) {
-	(void) fscanf(fp, "%x", p);
+	if (fscanf(fp, "%x", p));
 	for(j = 1; j <= LOOP(p); j++)
-	    (void) fscanf(fp, "%x", p+j);
+	    if (fscanf(fp, "%x", p+j));
     }
     return A;
 }
@@ -427,7 +427,7 @@ pset_family sf_bm_read(FILE *fp)
     register pset pdest;
     pset_family A;
 
-    (void) fscanf(fp, "%d %d\n", &rows, &cols);
+    if (fscanf(fp, "%d %d\n", &rows, &cols));
     A = sf_new(rows, cols);
     for(i = 0; i < rows; i++) {
 	pdest = GETSET(A, A->count++);

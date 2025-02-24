@@ -14,6 +14,7 @@
  */
 
 #include "set.h"
+#include "cvr.h"
 #include "main.h"		/* table definitions for options */
 #include <unistd.h>
 
